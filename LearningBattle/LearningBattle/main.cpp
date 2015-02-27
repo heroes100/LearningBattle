@@ -21,6 +21,7 @@ TODO List:
 
 
 + Create a quad tree for collision detection (tree maps players position to quadrants via tree)
++ Create bullet obeject such that Ships can fire bullets
 + Create a system which can manage ship objects (Creation/deletion etc)
 + Create seperate functions to handle tasks used in main loop (i.e Draw, Update, Increment 'cycle', etc)
 
@@ -40,31 +41,20 @@ Comeplete: Properly establish basic ship object
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(300, 300), "Learning Battle");
+	sf::RenderWindow window(sf::VideoMode(500, 400), "Learning Battle");
 
-	//Ship ship("ship.png");
-	//ship.setLocx(250);
-	//ship.setRotFromXY(100,200);
+	std::vector<Ship> shipArray(1, Ship("ship.png")); //Creates 100 ship objects in vector
 
-	//FIXME: Need to make vector empty and dynamic for ship storage
-	std::vector<Ship> shipArray(100, Ship("ship.png")); //Creates 100 ship objects in vector
-
-	shipArray[5].setLocy(250);
-	shipArray[5].setLocx(250);
-	
 
 	//addShipToList(shipArray, "ship.png");
 	shipArray[0].setLocx(250);
-	shipArray[1].setLocx(150);
-	//void * shipArray;
-	//shipArray = malloc(sizeof(Ship)* 100); //Array used to store 100 ships (need change later)
-	//assert(shipArray == NULL);
+	//shipArray[1].setLocx(150);
 
 	
-
 	sf::CircleShape circle(10.f);
-	circle.setPosition(80,200);
+	circle.setPosition(200,200);
 	circle.setFillColor(sf::Color::Green);
+
 	int temp = 0;
 	while (window.isOpen()){
 		sf::Event event;
@@ -76,14 +66,16 @@ int main()
 
 		//window.draw(ship.getSprite());
 		//drawShips(shipArray, window);
-		for(int i = 0; i < 100; i++){
+		for(int i = 0; i < shipArray.size(); i++){
 			
-			shipArray[i].setRot(shipArray[i].getRotFromXY(80,200));
+			//shipArray[i].setRot(shipArray[i].getRotFromXY(200,400));
+			shipArray[i].setRotFromXY(200,200);
 			if (temp%20 == 0){
 				//shipArray[i].setRot(shipArray[i].getRot() + 90); //Rotates clockwise
-				
+				///printf("rotation: %f\n",shipArray[0].getRot());
+				//shipArray[i].setRot(shipArray[i].getRot() + 10);
 			}
-			//shipArray[i].setRot(shipArray[i].getRot()+10);
+			
 			//printf("rot: %f\n", shipArray[0].getRot());
 			shipArray[i].incPositionFromRot();
 
@@ -92,11 +84,12 @@ int main()
 
 
 		temp++;
+
 		window.draw(circle);
 
 		window.display();
 
-		Sleep(50);
+		Sleep(20);
 	}
 	printf("Press esc ket to quit.");
 	scanf_s(".");

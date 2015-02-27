@@ -161,10 +161,12 @@
     <ClCompile Include="functions.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\..\Desktop\ship.png" />
+    <ClInclude Include="bullet.h" />
+    <ClInclude Include="ship.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ship.h" />
+    <Image Include="..\..\..\..\..\Desktop\ship.png" />
+    <Image Include="..\bullet.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

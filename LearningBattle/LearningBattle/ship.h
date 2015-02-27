@@ -2,9 +2,12 @@
 #include <math.h>
 #include <stdio.h>
 
+#define PI 3.14159265
+
 
 typedef float HealthUnit;
 enum status { dead = -1,idle, searching, engaging, attacking, retreating };
+float minRotSpeed = 0.1;
 sf::Texture shipTexture;
 
 
@@ -14,7 +17,8 @@ class Ship {
 private:
 	bool alive;
 	int status, id;
-	float rot, speed, maxSpeed, accel, deccel, health, locx, locy, scale;
+	float rot, rotSpeed, speed, maxSpeed, accel, deccel, locx, locy, scale, //Movement traits
+		  health, fireRange, fireDmg, accuracy, rof, ammo, bulletSpeed; //Combat traits
 	sf::Texture texture;
 	//sf::Sprite sprite;
 
@@ -28,13 +32,22 @@ public:
 		id = 0;
 		scale = 0.5f;
 		rot = 0;
-		speed = 10;
+		rotSpeed = 5;
+		speed = 2;
 		maxSpeed = 5;
 		accel = 0.1f;
 		deccel = 0.3f;
-		health = 0;
 		locx = 50;
 		locy = 50;
+
+		health = 100;
+		fireRange = 100;
+		fireDmg = 10;
+		accuracy = 60;
+		rof = 2;
+		ammo = 5;
+		bulletSpeed = 2;
+		
 
 		sprite.setPosition(locx, locy);
 		shipTexture.create(10, 10);
@@ -47,14 +60,27 @@ public:
 		sprite.setTexture(shipTexture);
 	}
 
-
+	/*
+	This function will calculate the X and Y movement based on the Ships current angle and speed
+	*/
 	void incPositionFromRot(){
 		float moveX, moveY = 0;
-		float rotation = ((int)this->rot % 360);
-		
+		float rotation = (this->rot/180)*PI; //Convert to radians for trig
+
 		moveX = cos(rotation);
 		moveY = sin(rotation);
-		/*if (rotation == 0){
+		///printf("rotation: %f    moveX: %f    moveY: %f\n",this->rot, moveX, moveY);
+		
+
+		this->setLocx(this->locx + (moveX*speed));
+		this->setLocy(this->locy + (moveY*speed));
+
+		/*
+		while (rotation < 0){
+		rotation += 360;
+		}
+		
+		if (rotation == 0){
 			moveY = -1;
 		}
 		else if (rotation == 90){
@@ -67,38 +93,152 @@ public:
 			moveX = -1;
 		}else if (90 > rotation && rotation > 0){
 			//In top right quadrent
-			moveX = sin(this->rot); //is Negative (to move left)
-			moveY = -cos(this->rot); //make Negative (to move up)
+			///printf("1\n");
+			moveX = sin(rotation); //is Negative (to move left)
+			moveY = -cos(rotation); //make Negative (to move up)
 		}else if (180 > rotation && rotation > 90){
 			//Bottom right quadrent
-			moveX = sin(this->rot); //is Positive (to move right)
-			moveY = -cos(this->rot); //make Negative to Positive (positive move down)
+			///printf("2\n");
+			moveX = sin(rotation); //is Positive (to move right)
+			moveY = -cos(rotation); //make Negative to Positive (positive move down)
 		}else if (270 > rotation && rotation > 180){
 			//Bottom left quadrent
-			moveX = sin(this->rot); //is negative (positive move left)
-			moveY = -cos(this->rot); //make Negative Positive (positive to move down)
+			///printf("3\n");
+			moveX = sin(rotation); //is negative (positive move left)
+			moveY = -cos(rotation); //make Negative Positive (positive to move down)
 		}else if (360 > rotation && rotation > 270){
 			//Should be in the top left quadrent
-			moveX = sin(this->rot); //is Negative (to move right)
-			moveY = cos(this->rot); //is Negative (to move up)
+			printf("4\n");
+			moveX = sin(rotation); //is Negative (to move right)
+			moveY = -cos(rotation); //make Negative (to move up)
+		}else{
+			///printf("Error calculating movement.\n");
 		}
-		*/
-
-		this->setLocx(this->locx+(moveX*speed));
-		this->setLocy(this->locy+(moveY*speed));
-		/*this->locx += (moveX*speed);
+		
+		///printf("moveX: %f\nmoveY: %f\n",moveX, moveY);
+		this->locx += (moveX*speed);
 		this->locy += (moveY*speed);
-		this->sprite.setPosition(this->locx, this->locy);*/
+		this->sprite.setPosition(this->locx, this->locy);
+		*/
+	}
+	
+	/*
+	This function will find the shortest rotation path (CW/CCW) to reach the target Rotation
+	Note: This function deals with rotation in degrees only
+	Note: This function favours Clockwise when both options are equal
+	*/
+	float rotateTo(float targetRot){
+		bool adjCurRot = false;
+		float finalRotation = 0;
+		float curRot = this->rot;
+		///printf("currently rotated at: %f\trot To: %f\trot rem: %f degrees\n",this->rot, targetRot, abs(targetRot - this->rot));
+
+		if (targetRot < 0){
+			//Adjust to make sure angle is positive
+			targetRot += 360;
+			//Need to track this since ship can deal with negatives
+			//Need to add 360 back if it was subtracted
+		}
+		if (this->rot < 0){
+			//Adjust to make sure angle is positive for logic
+			adjCurRot = true;
+			curRot += 360;
+			//Need to track this since ship deals with negative degrees
+		}
+
+		//Compare the distances for CW vs CCW
+		if ((targetRot - curRot) >= 0 || targetRot+180 < curRot){
+			//Clockwise is shorter rotation increase rotation
+			if (targetRot + 180 < curRot){ //Shorter to turn more than 360 (350->20 case)
+				if (targetRot+360 > (curRot + this->rotSpeed)){
+					finalRotation = curRot + this->rotSpeed;
+				}
+				else{
+					finalRotation = targetRot;
+				}
+			}else if (targetRot > (curRot+this->rotSpeed)){ 
+				//Target rotation is out of range, move by max rotation speed
+				finalRotation = curRot + this->rotSpeed;
+			}else{
+				//Target rotation is in range, move precisely to that angle
+				finalRotation = targetRot;
+			}
+		}else{ //Counter clockwise is shorter rotation
+			if (targetRot + 180 > curRot){ //Shorter to turn negative degrees (20->350 case)
+				//Shorter to rotate Coutner clockwise
+				if (targetRot - 360 < (curRot - this->rotSpeed)){
+					//Target rotation is out of range, move by max rotation speed
+					finalRotation = curRot - this->rotSpeed;
+				}else{
+					//Target rotation is in range, move precisely to that angle
+					finalRotation = targetRot;
+				}
+			}else if ((curRot - this->rotSpeed) > targetRot){
+				//Rotation is out of range, move by max rotation speed
+				finalRotation = curRot - this->rotSpeed;
+			}else{
+				//Rotation is in range, move precisely to that angle
+				finalRotation = targetRot;
+			}
+		}
+
+		if (adjCurRot){
+			//Revert back to origonal negative value if adjusted earlier
+			finalRotation -= 360;
+		}
+
+		return finalRotation;
+	}
+	
+
+	void rotateClockwise(float targetRot){
+		if (abs(this->rot - targetRot) > this->rotSpeed){
+			this->setRot(this->rot + rotSpeed);
+		}
+		else{
+			this->setRot(this->rot = targetRot);
+		}
 	}
 
 
+	void rotateCounterClockwise(float targetRot){
+		if (abs(this->rot - targetRot) > this->rotSpeed){
+			this->rot -= rotSpeed;
+		}
+		else{
+			this->rot = targetRot;
+		}
+	}
+
+
+	void incSpeed(){
+		this->speed += this->speed*(1+this->accel);
+		if (this->speed > this->maxSpeed){
+			this->speed = this->maxSpeed;
+		}
+	}
+
+
+	void decSpeed(){
+		this->speed -= this->speed*(1+this->deccel);
+		if (this->speed < 0){
+			this->speed = 0;
+		}
+	}
+
 	void setRotFromXY(float x, float y){
+		//TODO: Fix bug where ship won't intercept point due to speed/rotSpeed differences
+		// |-> Create calculations to help or reduce speed during rotation (or have both options available)
 
 		float deltaY = y - this->getLocy();
 		float deltaX = x - this->getLocx();
 
-		float angleInDegrees = (float)(-270 + (atan2(deltaY, deltaX) * 180 / 3.14159265)); //-90 is from image origin pointing up
-
+		float angleInDegrees = (float)((atan2(deltaY, deltaX) * 180 / PI)); //-90 is from image origin pointing up
+		/*if (angleInDegrees < 0){
+			angleInDegrees += 360;
+		}*/
+		///printf("Need %f degrees of rotation.\n",angleInDegrees);
+		
 		this->setRot(angleInDegrees);
 	}
 
@@ -107,8 +247,8 @@ public:
 		float deltaY = y - this->locy;
 		float deltaX = x - this->locx;
 
-		float angleInDegrees = (float)(-270 + (atan2(deltaY, deltaX) * 180 / 3.14159265)); //-270 is from image origin pointing up
-
+		float angleInDegrees = (float)( (atan2(deltaY, deltaX) * 180 / PI)); //-270 is from image origin pointing up
+		
 		return (int)angleInDegrees;
 	}
 
@@ -117,59 +257,63 @@ public:
 	* Getters And Setters
 	*/
 	bool getAlive(){
-		return alive;
+		return this->alive;
 	}
 
 	float getLocx(){
-		return locx;
+		return this->locx;
 	}
 
 	float getLocy(){
-		return locy;
+		return this->locy;
 	}
 
 	float getHealth(){
-		return health;
+		return this->health;
 	}
 
 	int getStatus(){
-		return status;
+		return this->status;
 	}
 
 	int getId(){
-		return id;
+		return this->id;
 	}
 
 	float getRot(){
-		return rot;
+		return this->rot;
+	}
+
+	float getRotSpeed(){
+		return this->rotSpeed;
 	}
 
 	float getSpeed(){
-		return speed;
+		return this->speed;
 	}
 
 	float getMaxSpeed(){
-		return maxSpeed;
+		return this->maxSpeed;
 	}
 
 	float getAccel(){
-		return accel;
+		return this->accel;
 	}
 
 	float getDeccel(){
-		return deccel;
+		return this->deccel;
 	}
 
 	float getScale(){
-		return scale;
+		return this->scale;
 	}
 
 	sf::Texture getTexture(){
-		return texture;
+		return this->texture;
 	}
 
 	sf::Sprite getSprite(){
-		return sprite;
+		return this->sprite;
 	}
 
 
@@ -199,9 +343,31 @@ public:
 		this->id = id;
 	}
 
+
 	void setRot(float rot){
-		this->sprite.setRotation(rot);
-		this->rot = rot;
+		float rotation;
+		//rot = ((int)rotation%360); //Makes degrees positive (loses up to 1 degree of accuracy)
+		//rot = (rot * 180 / PI); //Convert to degrees
+		/*if (rot < 0){ //Change to positive angles only
+			rot += 360; //FIXME: This might be causing problems with changing from 0->360 instantly
+		}*/
+
+		rotation = this->rotateTo(rot); //Get final ship rotation after adjustments from rotation speed
+		///printf("Rotation set to: %f degrees\n\n", rotation);
+		//rotation = (rotation * PI / 180); //Convert back to radians
+		//TODO: FIX radians and degrees use; it is causing issues/bugs
+		
+		this->sprite.setRotation(rotation + 90); //Adjust sprite to rotation
+		this->rot = rotation; //Adjust ship to rotation
+	}
+
+	void setRotSpeed(float rotSpeed){
+		if (rotSpeed > 0){
+			this->rotSpeed = rotSpeed;
+		}
+		else{
+			this->rotSpeed = minRotSpeed;
+		}
 	}
 
 	void setSpeed(float speed){
