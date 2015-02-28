@@ -1,13 +1,11 @@
-﻿Build started 2/21/2015 10:33:18 PM.
+﻿Build started 2/28/2015 1:47:56 PM.
      1>Project "C:\Users\Mark\documents\visual studio 2013\Projects\LearningBattle\LearningBattle\LearningBattle.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"C:\SFML-2.2\include" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt main.cpp
          main.cpp
-     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(64): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(246): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(252): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(299): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>main.cpp(71): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(10): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(68): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\mark\documents\visual studio 2013\projects\learningbattle\learningbattle\ship.h(421): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Mark\documents\visual studio 2013\Projects\LearningBattle\x64\Release\LearningBattle.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\SFML-2.2\lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "sfml-graphics.lib" "sfml-window.lib" "sfml-system.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Mark\documents\visual studio 2013\Projects\LearningBattle\x64\Release\LearningBattle.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Mark\documents\visual studio 2013\Projects\LearningBattle\x64\Release\LearningBattle.lib" /MACHINE:X64 x64\Release\main.obj
          x64\Release\functions.obj
@@ -18,4 +16,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.57
+Time Elapsed 00:00:06.49

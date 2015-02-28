@@ -10,7 +10,7 @@ sf::Texture bulletTexture;
 /*
 TODO:
 + Possibly implement a system inside/outside of bullet object that allows
-   for selection of different bullets externally more easily
+for selection of different bullets externally more easily
 */
 class Bullet {
 private:
