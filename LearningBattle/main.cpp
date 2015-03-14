@@ -50,12 +50,15 @@ int main()
 	shipArray[0].setLocx(250);
 	//shipArray[1].setLocx(150);
 
+<<<<<<< HEAD
 	//shipArray[2].setLocx(150);
 	//shipArray[1].setLocx(150);
 
 	///shipArray[1].texture.loadFromFile("ship2.png");
 	//shipArray[1].sprite.setTexture(shipArray[1].texture);
 
+=======
+>>>>>>> origin/master
 
 	sf::CircleShape circle(10.f);
 	circle.setPosition(200, 200);

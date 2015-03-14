@@ -19,7 +19,11 @@ private:
 	int status, id;
 	float rot, rotSpeed, speed, maxSpeed, accel, deccel, locx, locy, scale, //Movement traits
 		health, fireRange, fireDmg, accuracy, rof, ammo, bulletSpeed; //Combat traits
+<<<<<<< HEAD
 	//sf::Texture texture;
+=======
+	sf::Texture texture;
+>>>>>>> origin/master
 	//sf::Sprite sprite;
 
 public:
@@ -33,8 +37,13 @@ public:
 		id = 0;
 		scale = 0.5f;
 		rot = 0;
+<<<<<<< HEAD
 		rotSpeed = 2;
 		speed = 5;
+=======
+		rotSpeed = 5;
+		speed = 2;
+>>>>>>> origin/master
 		maxSpeed = 5;
 		accel = 0.1f;
 		deccel = 0.3f;
@@ -71,6 +80,10 @@ public:
 		moveX = cos(rotation);
 		moveY = sin(rotation);
 		///printf("rotation: %f    moveX: %f    moveY: %f\n",this->rot, moveX, moveY);
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 
 		this->setLocx(this->locx + (moveX*speed));
 		this->setLocy(this->locy + (moveY*speed));
@@ -90,6 +103,7 @@ public:
 			//Left half of circle
 			centerX = curX + (sin(curRot)*radius);
 		}
+<<<<<<< HEAD
 		else{
 			//Right half of circle
 			centerX = curX - (sin(curRot)*radius);
@@ -210,11 +224,152 @@ public:
 		else{
 			this->rot = targetRot;
 		}
+=======
+
+		if (rotation == 0){
+		moveY = -1;
+		}
+		else if (rotation == 90){
+		moveX = 1;
+		}
+		else if (rotation == 180){
+		moveY = 1;
+		}
+		else if (rotation == 270){
+		moveX = -1;
+		}else if (90 > rotation && rotation > 0){
+		//In top right quadrent
+		///printf("1\n");
+		moveX = sin(rotation); //is Negative (to move left)
+		moveY = -cos(rotation); //make Negative (to move up)
+		}else if (180 > rotation && rotation > 90){
+		//Bottom right quadrent
+		///printf("2\n");
+		moveX = sin(rotation); //is Positive (to move right)
+		moveY = -cos(rotation); //make Negative to Positive (positive move down)
+		}else if (270 > rotation && rotation > 180){
+		//Bottom left quadrent
+		///printf("3\n");
+		moveX = sin(rotation); //is negative (positive move left)
+		moveY = -cos(rotation); //make Negative Positive (positive to move down)
+		}else if (360 > rotation && rotation > 270){
+		//Should be in the top left quadrent
+		printf("4\n");
+		moveX = sin(rotation); //is Negative (to move right)
+		moveY = -cos(rotation); //make Negative (to move up)
+		}else{
+		///printf("Error calculating movement.\n");
+		}
+
+		///printf("moveX: %f\nmoveY: %f\n",moveX, moveY);
+		this->locx += (moveX*speed);
+		this->locy += (moveY*speed);
+		this->sprite.setPosition(this->locx, this->locy);
+		*/
+>>>>>>> origin/master
+	}
+
+	/*
+	This function will find the shortest rotation path (CW/CCW) to reach the target Rotation
+	Note: This function deals with rotation in degrees only
+	Note: This function favours Clockwise when both options are equal
+	*/
+	float rotateTo(float targetRot){
+		bool adjCurRot = false;
+		float finalRotation = 0;
+		float curRot = this->rot;
+		///printf("currently rotated at: %f\trot To: %f\trot rem: %f degrees\n",this->rot, targetRot, abs(targetRot - this->rot));
+
+		if (targetRot < 0){
+			//Adjust to make sure angle is positive
+			targetRot += 360;
+			//Need to track this since ship can deal with negatives
+			//Need to add 360 back if it was subtracted
+		}
+		if (this->rot < 0){
+			//Adjust to make sure angle is positive for logic
+			adjCurRot = true;
+			curRot += 360;
+			//Need to track this since ship deals with negative degrees
+		}
+
+		//Compare the distances for CW vs CCW
+		if ((targetRot - curRot) >= 0 || targetRot + 180 < curRot){
+			//Clockwise is shorter rotation increase rotation
+			if (targetRot + 180 < curRot){ //Shorter to turn more than 360 (350->20 case)
+				if (targetRot + 360 > (curRot + this->rotSpeed)){
+					finalRotation = curRot + this->rotSpeed;
+				}
+				else{
+					finalRotation = targetRot;
+				}
+			}
+			else if (targetRot > (curRot + this->rotSpeed)){
+				//Target rotation is out of range, move by max rotation speed
+				finalRotation = curRot + this->rotSpeed;
+			}
+			else{
+				//Target rotation is in range, move precisely to that angle
+				finalRotation = targetRot;
+			}
+		}
+		else{ //Counter clockwise is shorter rotation
+			if (targetRot + 180 > curRot){ //Shorter to turn negative degrees (20->350 case)
+				//Shorter to rotate Coutner clockwise
+				if (targetRot - 360 < (curRot - this->rotSpeed)){
+					//Target rotation is out of range, move by max rotation speed
+					finalRotation = curRot - this->rotSpeed;
+				}
+				else{
+					//Target rotation is in range, move precisely to that angle
+					finalRotation = targetRot;
+				}
+			}
+			else if ((curRot - this->rotSpeed) > targetRot){
+				//Rotation is out of range, move by max rotation speed
+				finalRotation = curRot - this->rotSpeed;
+			}
+			else{
+				//Rotation is in range, move precisely to that angle
+				finalRotation = targetRot;
+			}
+		}
+
+		if (adjCurRot){
+			//Revert back to origonal negative value if adjusted earlier
+			finalRotation -= 360;
+		}
+
+		return finalRotation;
+	}
+
+
+	void rotateClockwise(float targetRot){
+		if (abs(this->rot - targetRot) > this->rotSpeed){
+			this->setRot(this->rot + rotSpeed);
+		}
+		else{
+			this->setRot(this->rot = targetRot);
+		}
+	}
+
+
+	void rotateCounterClockwise(float targetRot){
+		if (abs(this->rot - targetRot) > this->rotSpeed){
+			this->rot -= rotSpeed;
+		}
+		else{
+			this->rot = targetRot;
+		}
 	}
 
 
 	void incSpeed(){
+<<<<<<< HEAD
 		this->speed += (this->accel);
+=======
+		this->speed += this->speed*(1 + this->accel);
+>>>>>>> origin/master
 		if (this->speed > this->maxSpeed){
 			this->speed = this->maxSpeed;
 		}
@@ -222,7 +377,11 @@ public:
 
 
 	void decSpeed(){
+<<<<<<< HEAD
 		this->speed -= (this->deccel);
+=======
+		this->speed -= this->speed*(1 + this->deccel);
+>>>>>>> origin/master
 		if (this->speed < 0){
 			this->speed = 0;
 		}
@@ -239,6 +398,7 @@ public:
 		/*if (angleInDegrees < 0){
 		angleInDegrees += 360;
 		}*/
+<<<<<<< HEAD
 
 
 
@@ -259,6 +419,8 @@ public:
 			this->incSpeed();
 		}
 
+=======
+>>>>>>> origin/master
 		///printf("Need %f degrees of rotation.\n",angleInDegrees);
 
 		this->setRot(angleInDegrees);
@@ -378,9 +540,13 @@ public:
 		///printf("Rotation set to: %f degrees\n\n", rotation);
 		//rotation = (rotation * PI / 180); //Convert back to radians
 		//TODO: FIX radians and degrees use; it is causing issues/bugs
+<<<<<<< HEAD
 		if (rotation > 360){
 			rotation -= 360;
 		}
+=======
+
+>>>>>>> origin/master
 		this->sprite.setRotation(rotation + 90); //Adjust sprite to rotation
 		this->rot = rotation; //Adjust ship to rotation
 	}
@@ -424,3 +590,34 @@ public:
 
 };
 
+<<<<<<< HEAD
+=======
+/*
+* IMPORTANT: This function might have a problem declaring the ship. The memory used for
+* declaring the ship might not be accessable after the function call causing major issues.
+*/
+int addShipToList(std::vector<Ship> shipArray, char * image){
+
+	Ship * ship = new Ship(image);
+
+	printf("array size: %d\n", shipArray.capacity());
+	if (shipArray._Unused_capacity() != shipArray.capacity()){
+		//printf("Array is not full. There is space to add another ship\n");
+		shipArray[shipArray._Unused_capacity()] = *ship;
+		ship->setId(shipArray._Unused_capacity());
+
+	}
+
+	return 0;
+}
+
+/*
+
+*/
+void drawShips(std::vector<Ship> shipArray, sf::RenderWindow window){
+	for (int i = 0; i < shipArray._Unused_capacity(); i++){
+		window.draw(shipArray[i].getSprite());
+	}
+
+}
+>>>>>>> origin/master
