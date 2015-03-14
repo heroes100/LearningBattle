@@ -43,16 +43,22 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(500, 400), "Learning Battle");
 
-	std::vector<Ship> shipArray(1, Ship("ship.png")); //Creates 100 ship objects in vector
+	std::vector<Ship> shipArray(1, Ship("ship.png")); //Creates ship objects in vector
 
 
 	//addShipToList(shipArray, "ship.png");
 	shipArray[0].setLocx(250);
 	//shipArray[1].setLocx(150);
 
-	
+	//shipArray[2].setLocx(150);
+	//shipArray[1].setLocx(150);
+
+	///shipArray[1].texture.loadFromFile("ship2.png");
+	//shipArray[1].sprite.setTexture(shipArray[1].texture);
+
+
 	sf::CircleShape circle(10.f);
-	circle.setPosition(200,200);
+	circle.setPosition(200, 200);
 	circle.setFillColor(sf::Color::Green);
 
 	int temp = 0;
@@ -66,15 +72,16 @@ int main()
 
 		//window.draw(ship.getSprite());
 		//drawShips(shipArray, window);
-		for(int i = 0; i < shipArray.size(); i++){
-			
-			shipArray[i].setRot(shipArray[i].getRotFromXY(200,400));
-			if (temp%20 == 0){
+		for (int i = 0; i < shipArray.size(); i++){
+
+			//shipArray[i].setRot(shipArray[i].getRotFromXY(200,400));
+			shipArray[i].setRotFromXY(200, 200);
+			if (temp % 20 == 0){
 				//shipArray[i].setRot(shipArray[i].getRot() + 90); //Rotates clockwise
 				///printf("rotation: %f\n",shipArray[0].getRot());
 				//shipArray[i].setRot(shipArray[i].getRot() + 10);
 			}
-			
+
 			//printf("rot: %f\n", shipArray[0].getRot());
 			shipArray[i].incPositionFromRot();
 

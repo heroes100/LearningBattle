@@ -166,6 +166,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\Desktop\ship.png" />
+    <Image Include="..\..\..\..\..\Desktop\ship1.png" />
+    <Image Include="..\..\..\..\..\Desktop\ship2.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
